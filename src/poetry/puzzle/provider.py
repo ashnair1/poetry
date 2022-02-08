@@ -84,6 +84,7 @@ class Indicator(ProgressIndicator):  # type: ignore[misc]
 @functools.lru_cache(maxsize=None)
 def _get_package_from_git(
     url: str,
+    directory: str | None = None,
     branch: str | None = None,
     tag: str | None = None,
     rev: str | None = None,
@@ -249,6 +250,7 @@ class Provider:
         package = self.get_package_from_vcs(
             dependency.vcs,
             dependency.source,
+            directory=dependency.directory,
             branch=dependency.branch,
             tag=dependency.tag,
             rev=dependency.rev,
@@ -276,6 +278,7 @@ class Provider:
     def get_package_from_vcs(
         vcs: str,
         url: str,
+        directory: str | None = None,
         branch: str | None = None,
         tag: str | None = None,
         rev: str | None = None,
