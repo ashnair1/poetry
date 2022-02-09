@@ -593,7 +593,10 @@ class Executor:
 
         # Now we just need to install from the source directory
         original_url = package.source_url
-        package._source_url = str(source.path)
+        if package.source_subdirectory:
+            package._source_url = str(source.path / Path(package.source_subdirectory))
+        else:
+            package._source_url = str(source.path)
 
         status_code = self._install_directory(operation)
 
