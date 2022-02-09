@@ -247,6 +247,8 @@ class Provider:
         ):
             return [self._deferred_cache[dependency]]
 
+        directory = dependency.directory if hasattr(dependency, "directory") else None
+
         package = self.get_package_from_vcs(
             dependency.vcs,
             dependency.source,
