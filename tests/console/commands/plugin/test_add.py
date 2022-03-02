@@ -161,6 +161,38 @@ Package operations: 3 installs, 0 updates, 0 removals
     )
 
 
+def test_add_with_git_constraint_with_subdirectory(
+    app: PoetryTestApplication,
+    repo: TestRepository,
+    tester: CommandTester,
+    env: MockEnv,
+    installed: Repository,
+):
+    repo.add_package(Package("pendulum", "2.0.5"))
+
+    tester.execute("git+https://github.com/demo/poetry-plugin2.git#subdirectory=subdir")
+
+    expected = """\
+Updating dependencies
+Resolving dependencies...
+
+Writing lock file
+
+Package operations: 2 installs, 0 updates, 0 removals
+
+  • Installing pendulum (2.0.5)
+  • Installing poetry-plugin (0.1.2 9cf87a2)
+"""
+
+    assert_plugin_add_result(
+        tester,
+        app,
+        env,
+        expected,
+        {"git": "https://github.com/demo/poetry-plugin2.git", "subdirectory": "subdir"},
+    )
+
+
 def test_add_existing_plugin_warns_about_no_operation(
     app: PoetryTestApplication,
     repo: TestRepository,
