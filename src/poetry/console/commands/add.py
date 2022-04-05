@@ -169,6 +169,9 @@ You can specify a package in the following forms:
                 assert isinstance(version, str)
                 parse_constraint(version)
 
+            if "subdirectory" in _constraint and _constraint["subdirectory"] is None:
+                del _constraint["subdirectory"]
+
             constraint: dict[str, Any] = inline_table()
             for name, value in _constraint.items():
                 if name == "name":
