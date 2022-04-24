@@ -10,6 +10,7 @@ from poetry.factory import Factory
 
 
 if TYPE_CHECKING:
+    from _pytest.fixtures import FixtureRequest
     from cleo.testers.command_tester import CommandTester
     from pytest_mock import MockerFixture
 
@@ -161,7 +162,17 @@ Package operations: 3 installs, 0 updates, 0 removals
     )
 
 
+@pytest.mark.parametrize(
+    "url",
+    [
+        "git+https://github.com/demo/poetry-plugin2.git#subdirectory=subdir",
+        "git+https://github.com/demo/poetry-plugin2.git@master#subdirectory=subdir",
+    ],
+    ids=["norev", "rev"],
+)
 def test_add_with_git_constraint_with_subdirectory(
+    url: str,
+    request: FixtureRequest,
     app: PoetryTestApplication,
     repo: TestRepository,
     tester: CommandTester,
@@ -170,7 +181,7 @@ def test_add_with_git_constraint_with_subdirectory(
 ):
     repo.add_package(Package("pendulum", "2.0.5"))
 
-    tester.execute("git+https://github.com/demo/poetry-plugin2.git#subdirectory=subdir")
+    tester.execute(url)
 
     expected = """\
 Updating dependencies
@@ -184,12 +195,21 @@ Package operations: 2 installs, 0 updates, 0 removals
   • Installing poetry-plugin (0.1.2 9cf87a2)
 """
 
+    constraint = {
+        "git": "https://github.com/demo/poetry-plugin2.git",
+        "subdirectory": "subdir",
+    }
+
+    testid = request.node.callspec.id
+    if testid == "rev":
+        constraint["rev"] = "master"
+
     assert_plugin_add_result(
         tester,
         app,
         env,
         expected,
-        {"git": "https://github.com/demo/poetry-plugin2.git", "subdirectory": "subdir"},
+        constraint,
     )
 
 
