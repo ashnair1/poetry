@@ -772,6 +772,8 @@ class Executor:
                 "commit_id": package.source_resolved_reference,
             },
         }
+        if package.source_subdirectory:
+            reference["subdirectory"] = package.source_subdirectory
 
         return reference
 
