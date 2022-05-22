@@ -16,6 +16,7 @@ from tests.helpers import get_package
 
 
 if TYPE_CHECKING:
+    from _pytest.fixtures import FixtureRequest
     from cleo.testers.command_tester import CommandTester
     from pytest_mock import MockerFixture
 
@@ -352,6 +353,52 @@ Package operations: 4 installs, 0 updates, 0 removals
         "git": "https://github.com/demo/demo.git",
         "extras": ["foo", "bar"],
     }
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "git+https://github.com/demo/subdirectories.git#subdirectory=two",
+        "git+https://github.com/demo/subdirectories.git@master#subdirectory=two",
+    ],
+    ids=["norev", "rev"],
+)
+def test_add_git_constraint_with_subdirectory(
+    url: str,
+    request: FixtureRequest,
+    app: PoetryTestApplication,
+    repo: TestRepository,
+    tester: CommandTester,
+    env: MockEnv,
+):
+    tester.execute(url)
+
+    expected = """\
+Updating dependencies
+Resolving dependencies...
+
+Writing lock file
+
+Package operations: 1 install, 0 updates, 0 removals
+
+  • Installing two (2.0.0 9cf87a2)
+"""
+    assert tester.io.fetch_output().strip() == expected.strip()
+    assert tester.command.installer.executor.installations_count == 1
+
+    content = app.poetry.file.read()["tool"]["poetry"]
+
+    constraint = {
+        "git": "https://github.com/demo/subdirectories.git",
+        "subdirectory": "two",
+    }
+
+    testid = request.node.callspec.id
+    if testid == "rev":
+        constraint["rev"] = "master"
+
+    assert "two" in content["dependencies"]
+    assert content["dependencies"]["two"] == constraint
 
 
 @pytest.mark.parametrize("editable", [False, True])
