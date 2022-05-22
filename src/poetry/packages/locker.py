@@ -609,7 +609,7 @@ class Locker:
                 data["source"]["resolved_reference"] = package.source_resolved_reference
 
             if package.source_subdirectory:
-                data["source"]["source_subdirectory"] = package.source_subdirectory
+                data["source"]["subdirectory"] = package.source_subdirectory
 
             if package.source_type in ["directory", "git"]:
                 data["develop"] = package.develop
