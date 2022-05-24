@@ -432,11 +432,11 @@ You can specify a package in the following forms:
             if "version" in requirement and len(requirement) == 1:
                 constraint = requirement["version"]
             else:
-                if (
-                    "subdirectory" in requirement
-                    and requirement["subdirectory"] is None
-                ):
-                    del requirement["subdirectory"]
+                # if (
+                #     "subdirectory" in requirement
+                #     and requirement["subdirectory"] is None
+                # ):
+                #     del requirement["subdirectory"]
                 constraint = inline_table()
                 constraint.trivia.trail = "\n"
                 constraint.update(requirement)

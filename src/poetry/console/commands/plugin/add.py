@@ -139,8 +139,8 @@ You can specify a package in the following forms:
             if "version" in plugin:
                 # Validate version constraint
                 parse_constraint(plugin["version"])
-            if "subdirectory" in plugin and plugin["subdirectory"] is None:
-                del plugin["subdirectory"]
+            # if "subdirectory" in plugin and plugin["subdirectory"] is None:
+            #     del plugin["subdirectory"]
 
             constraint: dict[str, Any] = tomlkit.inline_table()
             for name, value in plugin.items():
