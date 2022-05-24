@@ -19,6 +19,7 @@ from poetry.core.packages.file_dependency import FileDependency
 from poetry.core.packages.utils.link import Link
 from poetry.core.packages.utils.utils import url_to_path
 from poetry.core.pyproject.toml import PyProjectTOML
+from poetry.console.commands import source
 
 from poetry.installation.chef import Chef
 from poetry.installation.chooser import Chooser
@@ -113,10 +114,10 @@ class Executor:
         return self
 
     def pip_install(
-        self, req: Path | Link, upgrade: bool = False, editable: bool = False
+        self, req: Path | Link, upgrade: bool = False, editable: bool = False, subdirectory=None,
     ) -> int:
         try:
-            pip_install(req, self._env, upgrade=upgrade, editable=editable)
+            pip_install(req, self._env, upgrade=upgrade, editable=editable, subdirectory=subdirectory)
         except EnvCommandError as e:
             output = decode(e.e.output)
             if (
@@ -475,7 +476,12 @@ class Executor:
             " <info>Installing...</info>"
         )
         self._write(operation, message)
-        return self.pip_install(archive, upgrade=operation.job_type == "update")
+        import pdb; pdb.set_trace()
+        if hasattr(package, "source_subdirectory"):
+            subdirectory = package.source_subdirectory
+        else:
+            subdirectory = None
+        return self.pip_install(archive, upgrade=operation.job_type == "update", subdirectory=subdirectory)
 
     def _update(self, operation: Install | Update) -> int:
         return self._install(operation)
@@ -611,6 +617,7 @@ class Executor:
 
     def _download_link(self, operation: Install | Update, link: Link) -> Link:
         package = operation.package
+        import pdb; pdb.set_trace()
 
         archive = self._chef.get_cached_archive_for_link(link)
         if archive is link:
@@ -686,6 +693,11 @@ class Executor:
                 progress.start()
 
         done = 0
+        import pdb;pdb.set_trace()
+        # TODO: Remove this
+        # Need to add #subdirectory fragment to archive name
+        #filename = f"{link.filename}#subdirectory={operation.package.source_subdirectory}" if operation.package.source_subdirectory else link.filename
+
         archive: Path = self._chef.get_cache_directory_for_link(link) / link.filename
         archive.parent.mkdir(parents=True, exist_ok=True)
         with archive.open("wb") as f:
@@ -704,7 +716,7 @@ class Executor:
         if progress:
             with self._lock:
                 progress.finish()
-
+        import pdb;pdb.set_trace()
         return archive
 
     def _should_write_operation(self, operation: Operation) -> bool:
@@ -781,10 +793,10 @@ class Executor:
         self, package: Package
     ) -> dict[str, str | dict[str, str]]:
         archive_info = {}
-
+        import pdb; pdb.set_trace()
         if package.name in self._hashes:
             archive_info["hash"] = self._hashes[package.name]
-
+        # TODO: subdirectory might be required here
         reference = {"url": package.source_url, "archive_info": archive_info}
 
         return reference

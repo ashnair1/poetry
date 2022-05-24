@@ -127,6 +127,7 @@ class Locker:
                 source_url=url,
                 source_reference=source.get("reference"),
                 source_resolved_reference=source.get("resolved_reference"),
+                source_subdirectory=source.get("subdirectory"),
             )
             package.description = info.get("description", "")
             package.category = info.get("category", "main")

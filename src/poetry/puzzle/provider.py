@@ -319,8 +319,11 @@ class Provider:
         return [package]
 
     @classmethod
-    def get_package_from_file(cls, file_path: Path) -> Package:
+    def get_package_from_file(
+        cls, file_path: Path, source_subdirectory: str = None
+    ) -> Package:
         try:
+            PackageInfo._source_subdirectory = source_subdirectory
             package = PackageInfo.from_path(path=file_path).to_package(
                 root_dir=file_path
             )
@@ -386,7 +389,12 @@ class Provider:
         with tempfile.TemporaryDirectory() as temp_dir:
             dest = Path(temp_dir) / file_name
             download_file(url, str(dest))
-            package = cls.get_package_from_file(dest)
+            subdir_exists = re.search(rf"(?<=[#@]subdirectory=)\w+", url)
+            if subdir_exists:
+                source_subdirectory = subdir_exists.group(0)
+            else:
+                source_subdirectory = None
+            package = cls.get_package_from_file(dest, source_subdirectory)
 
         package._source_type = "url"
         package._source_url = url

@@ -178,6 +178,7 @@ class InstalledRepository(Repository):
         source_url = None
         source_reference = None
         source_resolved_reference = None
+        source_subdirectory = None
         develop = False
 
         url_reference = json.loads(
