@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from poetry.core.packages.utils.link import Link
@@ -8,8 +9,6 @@ from poetry.core.packages.utils.utils import url_to_path
 from poetry.exceptions import PoetryException
 from poetry.utils.env import EnvCommandError
 
-import re
-from pathlib import Path    
 
 if TYPE_CHECKING:
 
@@ -24,18 +23,8 @@ def pip_install(
     upgrade: bool = False,
     subdirectory: str = None,
 ) -> int | str:
-    import pdb;pdb.set_trace()
     path = url_to_path(path.url) if isinstance(path, Link) else path
     is_wheel = path.suffix == ".whl"
-    
-    # subdir_exists = re.search(rf"(?<=[#@]subdirectory=)\w+", str(path))
-    # if subdir_exists:
-    #     nosubdir_path = re.sub(rf"[&#]subdirectory=\w+", "", str(path))
-    #     path_suffix = Path(nosubdir_path).suffix
-    # else:
-    #     path_suffix = path.suffix
-    
-    # is_archive = path_suffix in {".tar.bz2", ".tar.gz", ".zip"}
 
     # We disable version check here as we are already pinning to version available in
     # either the virtual environment or the virtualenv package embedded wheel. Version
@@ -58,9 +47,7 @@ def pip_install(
                 "Cannot install non directory dependencies in editable mode"
             )
         args.append("-e")
-    
-    # if is_archive:
-    #     path = Path("file:" + str(path))
+
     if subdirectory:
         path = Path("file:" + str(path) + f"#subdirectory={subdirectory}")
 

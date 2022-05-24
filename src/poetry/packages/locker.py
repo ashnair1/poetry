@@ -115,6 +115,7 @@ class Locker:
         for info in locked_packages:
             source = info.get("source", {})
             source_type = source.get("type")
+            #import pdb; pdb.set_trace()
             url = source.get("url")
             if source_type in ["directory", "file"]:
                 url = self._lock.path.parent.joinpath(url).resolve().as_posix()

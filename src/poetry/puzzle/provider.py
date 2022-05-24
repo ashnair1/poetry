@@ -389,7 +389,7 @@ class Provider:
         with tempfile.TemporaryDirectory() as temp_dir:
             dest = Path(temp_dir) / file_name
             download_file(url, str(dest))
-            subdir_exists = re.search(rf"(?<=[#@]subdirectory=)\w+", url)
+            subdir_exists = re.search(r"(?<=[#@]subdirectory=)\w+", url)
             if subdir_exists:
                 source_subdirectory = subdir_exists.group(0)
             else:
