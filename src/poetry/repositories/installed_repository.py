@@ -103,7 +103,7 @@ class InstalledRepository(Repository):
     ) -> Package:
         # We first check for a direct_url.json file to determine
         # the type of package.
-        #import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
         path = Path(str(distribution._path))  # type: ignore[attr-defined]
 
         if (

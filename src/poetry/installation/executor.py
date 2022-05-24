@@ -485,7 +485,7 @@ class Executor:
             " <info>Installing...</info>"
         )
         self._write(operation, message)
-        #import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
         if hasattr(package, "source_subdirectory"):
             subdirectory = package.source_subdirectory
         else:
@@ -628,7 +628,7 @@ class Executor:
 
     def _download_link(self, operation: Install | Update, link: Link) -> Link:
         package = operation.package
-        #import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
 
         archive = self._chef.get_cached_archive_for_link(link)
         if archive is link:
@@ -704,7 +704,7 @@ class Executor:
                 progress.start()
 
         done = 0
-        #import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         # TODO: Remove this
         # Need to add #subdirectory fragment to archive name
         # filename = f"{link.filename}#subdirectory={operation.package.source_subdirectory}" if operation.package.source_subdirectory else link.filename
@@ -727,7 +727,7 @@ class Executor:
         if progress:
             with self._lock:
                 progress.finish()
-        #import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
         return archive
 
     def _should_write_operation(self, operation: Operation) -> bool:
@@ -804,12 +804,13 @@ class Executor:
         self, package: Package
     ) -> dict[str, str | dict[str, str]]:
         archive_info = {}
-        #import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         if package.name in self._hashes:
             archive_info["hash"] = self._hashes[package.name]
-        # TODO: subdirectory might be required here
-        reference = {"url": package.source_url, "archive_info": archive_info}
 
+        reference = {"url": package.source_url, "archive_info": archive_info}
+        if package.source_subdirectory:
+            reference["subdirectory"] = package.source_subdirectory
         return reference
 
     def _create_file_url_reference(
@@ -820,10 +821,13 @@ class Executor:
         if package.name in self._hashes:
             archive_info["hash"] = self._hashes[package.name]
 
-        return {
+        reference = {
             "url": Path(package.source_url).as_uri(),
             "archive_info": archive_info,
         }
+        if package.source_subdirectory:
+            reference["subdirectory"] = package.source_subdirectory
+        return reference
 
     def _create_directory_url_reference(
         self, package: Package
@@ -833,7 +837,10 @@ class Executor:
         if package.develop:
             dir_info["editable"] = True
 
-        return {
+        reference = {
             "url": Path(package.source_url).as_uri(),
             "dir_info": dir_info,
         }
+        if package.source_subdirectory:
+            reference["subdirectory"] = package.source_subdirectory
+        return reference
